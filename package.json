@@ -5,23 +5,32 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-      "build": "tsc",
-      "prepare": "npm run build"
+        "build": "tsc",
+        "prepare": "npm run build"
     },
     "repository": {
-      "type": "git",
-      "url": "https://github.com/your-org/langchain-auth-tools.git"
+        "type": "git",
+        "url": "https://github.com/your-org/langchain-auth-tools.git"
     },
-    "keywords": ["langchain", "auth", "authorization", "scopes", "claims"],
+    "keywords": [
+        "langchain",
+        "auth",
+        "authorization",
+        "scopes",
+        "claims"
+    ],
     "author": "Your Name <you@example.com>",
     "license": "MIT",
     "peerDependencies": {
-      "langchain": "*"
+        "langchain": "*"
     },
     "dependencies": {
-      "jose": "^4.0.0"
+        "jose": "^4.0.0",
+        "jsonwebtoken": "^9.0.2",
+        "zod": "^3.24.2"
     },
     "devDependencies": {
-      "typescript": "^4.0.0"
+        "@types/jsonwebtoken": "^9.0.9",
+        "typescript": "^4.0.0"
     }
-  }
+}

@@ -1,10 +1,11 @@
 import { StructuredTool } from 'langchain/tools';
-import { jwtVerify, JWTVerifyResult, JWTPayload } from 'jose';
+import { z, ZodObject, ZodRawShape } from 'zod';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 /**
  * Payload esperado do JWT
  */
-export interface JwtPayloadSchema extends JWTPayload {
+export interface JwtPayloadSchema extends JwtPayload {
   sub: string;
   scopes?: string[];
   scope?: string;
@@ -13,25 +14,33 @@ export interface JwtPayloadSchema extends JWTPayload {
 /**
  * Extensão de StructuredTool do LangChain com escopos obrigatórios
  */
-export class PermissionedTool extends StructuredTool {
+export class PermissionedTool extends StructuredTool<ZodObject<ZodRawShape>> {
   public requiredScopes: string[];
+  name: string;
+  description: string;
+  schema: ZodObject<ZodRawShape>;
+  private func: (input: any) => Promise<any>;
 
   constructor(opts: {
     name: string;
     description: string;
     func: (input: any) => Promise<any>;
-    schema?: any;
+    schema?: ZodObject<ZodRawShape>;
     requiredScopes: string[];
   }) {
-    super({
-      name: opts.name,
-      description: opts.description,
-      func: opts.func,
-      schema: opts.schema,
-    });
+    super();
+    this.name = opts.name;
+    this.description = opts.description;
+    this.schema = opts.schema ?? z.object({});
+    this.func = opts.func;
     this.requiredScopes = opts.requiredScopes;
   }
+
+  protected async _call(input: any): Promise<any> {
+    return this.func(input);
+  }
 }
+
 
 /**
  * Opções do AuthToolAdapter
@@ -43,7 +52,7 @@ export interface AuthToolAdapterOptions {
 
 export class AuthToolAdapter {
   private tools: PermissionedTool[];
-  private secret?: Uint8Array;
+  private secret?: string;
   private skipJwt: boolean;
 
   constructor(tools: PermissionedTool[], options: AuthToolAdapterOptions) {
@@ -53,7 +62,7 @@ export class AuthToolAdapter {
       if (!options.jwtSecret) {
         throw new Error('jwtSecret é obrigatório quando skipJwt=false');
       }
-      this.secret = new TextEncoder().encode(options.jwtSecret);
+      this.secret = options.jwtSecret;
     }
   }
 
@@ -61,12 +70,15 @@ export class AuthToolAdapter {
     if (this.skipJwt) {
       throw new Error('JWT validation está desabilitada (skipJwt=true)');
     }
-    const { payload }: JWTVerifyResult = await jwtVerify(
-      token,
-      this.secret!,
-      { algorithms: ['HS256'] }
-    );
-    return this.filterByPayload(payload as JwtPayloadSchema);
+
+    let payload: JwtPayloadSchema;
+    try {
+      payload = jwt.verify(token, this.secret!) as JwtPayloadSchema;
+    } catch (err) {
+      throw new Error('JWT inválido: ' + (err as Error).message);
+    }
+
+    return this.filterByPayload(payload);
   }
 
   public getAllowedToolsFromScopes(scopes: string[]): PermissionedTool[] {
