@@ -16,6 +16,15 @@ npm install langchain-auth-tools jose
 
 ```ts
 import { PermissionedTool, AuthToolAdapter } from 'langchain-auth-tools';
+import { ChatGroq } from "@langchain/groq";
+
+const llm = new ChatGroq({
+  model: "llama-3.3-70b-versatile",
+  temperature: 0,
+  maxTokens: undefined,
+  maxRetries: 2,
+  // other params...
+});
 
 // Define your tools with the required scopes
 const calendar = new PermissionedTool({
@@ -34,6 +43,8 @@ const adapter = new AuthToolAdapter(allTools, { jwtSecret: 'YOUR_SECRET' });
 // Get the allowed tools for a user from their JWT
 const allowed = await adapter.getAllowedToolsFromJwt(userJwt);
 
+const llmWithTools = llm.bindTools(allowed);
+
 ```
 
 ### Expected JWT Payload
@@ -46,6 +57,18 @@ interface JwtPayload {
   [key: string]: any;
 }
 ```
+
+### Without JWT Payload
+
+```ts
+// skip JWT token verification
+const adapter = new AuthToolAdapter(allTools, { skipJwt: true });
+
+// manually define the authorized scopes
+const allowed = await adapter.getAllowedToolsFromScopes([Scopes.CALENDAR, Scopes.CALCULATOR]);
+
+```
+
 
 ## 🙋 How to Contribute
 
