@@ -9,7 +9,7 @@ Easily restrict access to tools by defining required scopes. Ideal for multi-use
 ## 📦 Installation
 
 ```bash
-npm install langchain-auth-tools jose
+npm install langchain-auth-tools zod jsonwebtoken
 ```
 
 ## Uso

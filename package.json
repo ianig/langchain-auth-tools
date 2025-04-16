@@ -1,6 +1,6 @@
 {
     "name": "langchain-auth-tools",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Adapter para autorização de ferramentas LangChain baseado em JWT scopes/claims ou escopos diretos",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -36,6 +36,7 @@
         "ts-jest": "^29.3.2",
         "typescript": "^4.0.0"
     },
+    "files": ["dist"],
     "exports": {
         ".": {
           "import": "./dist/index.js",
