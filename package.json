@@ -1,0 +1,27 @@
+{
+    "name": "langchain-auth-tools",
+    "version": "1.0.0",
+    "description": "Adapter para autorização de ferramentas LangChain baseado em JWT scopes/claims ou escopos diretos",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+      "build": "tsc",
+      "prepare": "npm run build"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/your-org/langchain-auth-tools.git"
+    },
+    "keywords": ["langchain", "auth", "authorization", "scopes", "claims"],
+    "author": "Your Name <you@example.com>",
+    "license": "MIT",
+    "peerDependencies": {
+      "langchain": "*"
+    },
+    "dependencies": {
+      "jose": "^4.0.0"
+    },
+    "devDependencies": {
+      "typescript": "^4.0.0"
+    }
+  }
